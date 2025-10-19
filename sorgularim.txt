@@ -1,0 +1,256 @@
+================================================================================
+SQL AGENT - SORGU GEÇMİŞİ
+================================================================================
+
+
+================================================================================
+SORGU #1
+TARİH: 2025-10-12 11:02:45
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+son 20 siparişin fiyatlarını göster
+
+📋 TABLOLAR:
+Orders, Products, Order Details
+
+🔍 SQL SORGUSU:
+SELECT O.OrderID, SUM(OD.UnitPrice * OD.Quantity) AS TotalPrice
+FROM Orders O
+JOIN [Order Details] OD ON O.OrderID = OD.OrderID
+GROUP BY O.OrderID
+ORDER BY TotalPrice DESC
+OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY;
+
+📊 SONUÇLAR: 20 satır
+
+
+================================================================================
+SORGU #2
+TARİH: 2025-10-12 11:07:05
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+en son satılan 5 siparişin tarihleri ve fiyatlarını göster bir de bunların tedarikçi şehri nedir
+
+📋 TABLOLAR:
+Orders
+
+🔍 SQL SORGUSU:
+SELECT TOP 5 OrderDate AS SiparisTarihi, Freight AS Fiyat, ShipCity AS TedarikciSehri
+FROM Orders
+ORDER BY OrderDate DESC;
+
+📊 SONUÇLAR: 5 satır
+Veri: [{'SiparisTarihi': datetime.datetime(1998, 5, 6, 0, 0), 'Fiyat': Decimal('8.5300'), 'TedarikciSehri': 'Albuquerque'}, {'SiparisTarihi': datetime.datetime(1998, 5, 6, 0, 0), 'Fiyat': Decimal('38.2800'), 'TedarikciSehri': 'Marseille'}, {'SiparisTarihi': datetime.datetime(1998, 5, 6, 0, 0), 'Fiyat': Decimal('6.1900'), 'TedarikciSehri': 'Genève'}, {'SiparisTarihi': datetime.datetime(1998, 5, 6, 0, 0), 'Fiyat': Decimal('18.4400'), 'TedarikciSehri': 'Kobenhavn'}, {'SiparisTarihi': datetime.datetime(1998, 5, 5, 0, 0), 'Fiyat': Decimal('24.9500'), 'TedarikciSehri': 'México D.F.'}]
+
+
+================================================================================
+SORGU #2
+TARİH: 2025-10-12 12:35:14
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+en kısa isimli kişi
+
+📋 TABLOLAR:
+ogrenciler
+
+🔍 SQL SORGUSU:
+SELECT ad AS en_kisa_isim 
+FROM ogrenciler 
+ORDER BY LEN(ad) ASC 
+OFFSET 0 ROWS 
+FETCH NEXT 1 ROWS ONLY;
+
+📊 SONUÇLAR: 1 satır
+Veri: [{'en_kisa_isim': 'sami'}]
+
+
+================================================================================
+ZAMANLANMIŞ SORGU #3 (Schedule ID: 10)
+TARİH: 2025-10-14 14:53:03 +03
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+en son kayıt olan kişi
+
+📋 TABLOLAR:
+ogrenciler
+
+🔍 SQL SORGUSU:
+SELECT TOP 1 ad AS FirstName, soyad AS LastName, email, kayit_tarihi AS RegistrationDate
+FROM ogrenciler
+ORDER BY kayit_tarihi DESC
+
+📊 SONUÇLAR: 1 satır
+
+
+================================================================================
+SORGU #4
+TARİH: 2025-10-14 14:53:58 +03
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+en son kayıt olan kişi
+
+📋 TABLOLAR:
+ogrenciler
+
+🔍 SQL SORGUSU:
+SELECT TOP 1 ad AS FirstName, soyad AS LastName, email, kayit_tarihi AS RegistrationDate
+FROM ogrenciler
+ORDER BY kayit_tarihi DESC
+
+📊 SONUÇLAR: 1 satır
+Veri: [{'FirstName': 'yasin', 'LastName': 'öncel', 'email': 'yasin@gmail.com', 'RegistrationDate': datetime.datetime(2025, 3, 22, 16, 59, 35, 700000)}]
+
+
+================================================================================
+ZAMANLANMIŞ SORGU #5 (Schedule ID: 10)
+TARİH: 2025-10-14 14:54:23 +03
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+en son kayıt olan kişi
+
+📋 TABLOLAR:
+ogrenciler
+
+🔍 SQL SORGUSU:
+SELECT TOP 1 ad AS FirstName, soyad AS LastName, email, kayit_tarihi AS RegistrationDate
+FROM ogrenciler
+ORDER BY kayit_tarihi DESC;
+
+📊 SONUÇLAR: 1 satır
+
+
+================================================================================
+SORGU #6
+TARİH: 2025-10-14 15:03:17 +03
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+en son kayıt olan kişi
+
+📋 TABLOLAR:
+musteriler
+
+🔍 SQL SORGUSU:
+SELECT musteri_id, ad, soyad, email, kayit_tarihi 
+FROM musteriler 
+ORDER BY kayit_tarihi DESC 
+OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;
+
+📊 SONUÇLAR: 1 satır
+Veri: [{'musteri_id': 13, 'ad': 'sıla', 'soyad': 'yıldırım', 'email': 'sıla@gmail.com', 'kayit_tarihi': datetime.datetime(2025, 10, 14, 14, 53, 11, 180000)}]
+
+
+================================================================================
+ZAMANLANMIŞ SORGU #7 (Schedule ID: 11)
+TARİH: 2025-10-14 15:04:05 +03
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+en son kayıt olan kişi
+
+📋 TABLOLAR:
+musteriler
+
+🔍 SQL SORGUSU:
+SELECT musteri_id, ad, soyad, email, kayit_tarihi 
+FROM musteriler 
+ORDER BY kayit_tarihi DESC 
+OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;
+
+📊 SONUÇLAR: 1 satır
+
+
+================================================================================
+SORGU #3
+TARİH: 2025-10-15 14:48:38 +03
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+en son verilen sipariş
+
+📋 TABLOLAR:
+Orders
+
+🔍 SQL SORGUSU:
+SELECT TOP 1 * 
+FROM Orders 
+ORDER BY OrderDate DESC;
+
+📊 SONUÇLAR: 1 satır
+Veri: [{'OrderID': 11077, 'CustomerID': 'RATTC', 'EmployeeID': 1, 'OrderDate': datetime.datetime(1998, 5, 6, 0, 0), 'RequiredDate': datetime.datetime(1998, 6, 3, 0, 0), 'ShippedDate': None, 'ShipVia': 2, 'Freight': Decimal('8.5300'), 'ShipName': 'Rattlesnake Canyon Grocery', 'ShipAddress': '2817 Milton Dr.', 'ShipCity': 'Albuquerque', 'ShipRegion': 'NM', 'ShipPostalCode': '87110', 'ShipCountry': 'USA'}]
+
+
+================================================================================
+ZAMANLANMIŞ SORGU #8 (Schedule ID: 10)
+TARİH: 2025-10-15 15:09:44 +03
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+en son kayıt olan kişi
+
+📋 TABLOLAR:
+ogrenciler
+
+🔍 SQL SORGUSU:
+SELECT TOP 1 ad AS FirstName, soyad AS LastName, email, kayit_tarihi AS RegistrationDate
+FROM ogrenciler
+ORDER BY kayit_tarihi DESC
+
+📊 SONUÇLAR: 1 satır
+
+
+================================================================================
+ZAMANLANMIŞ SORGU #9 (Schedule ID: 12)
+TARİH: 2025-10-15 15:12:01 +03
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+en uzun isimli kişi
+
+📋 TABLOLAR:
+musteriler
+
+🔍 SQL SORGUSU:
+SELECT ad, soyad 
+FROM musteriler 
+WHERE LEN(ad) = (SELECT MAX(LEN(ad)) FROM musteriler)
+
+📊 SONUÇLAR: 1 satır
+
+
+================================================================================
+ZAMANLANMIŞ SORGU #10 (Schedule ID: 12)
+TARİH: 2025-10-15 15:25:02 +03
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+en uzun isimli kişi
+
+📋 TABLOLAR:
+musteriler
+
+🔍 SQL SORGUSU:
+SELECT ad, soyad 
+FROM musteriler 
+WHERE LEN(ad) = (SELECT MAX(LEN(ad)) FROM musteriler)
+
+📊 SONUÇLAR: 1 satır
+
