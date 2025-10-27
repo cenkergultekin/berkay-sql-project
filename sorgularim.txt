@@ -254,3 +254,25 @@ WHERE LEN(ad) = (SELECT MAX(LEN(ad)) FROM musteriler)
 
 📊 SONUÇLAR: 1 satır
 
+
+================================================================================
+SORGU #1
+TARİH: 2025-10-28 00:28:30 +03
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+En pahalı 10 ürünün miktarını küçükten büyüğe sırala
+
+📋 TABLOLAR:
+Products, Order Details, CustomerCustomerDemo
+
+🔍 SQL SORGUSU:
+SELECT ProductName, UnitPrice, UnitsInStock 
+FROM Products 
+ORDER BY UnitPrice DESC 
+OFFSET 0 ROWS 
+FETCH NEXT 10 ROWS ONLY;
+
+📊 SONUÇLAR: 10 satır
+
