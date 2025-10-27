@@ -8,8 +8,7 @@ SQL Agent represents the next generation of database interaction tools, combinin
 
 - **Natural Language Processing**: Convert complex business questions into precise SQL queries using OpenAI's advanced language models
 - **Intelligent Schema Discovery**: Automatically discover and map database structures, tables, and relationships
-- **Advanced Visualization**: Generate interactive charts and reports from query results using Chart.js
-- **Automated Scheduling**: Execute queries on custom schedules with comprehensive monitoring and logging
+- **Advanced Visualization**: Generate interactive charts from query results using Chart.js
 - **Enterprise Security**: Zero-trust architecture with OS-level credential encryption and no plaintext storage
 
 ## 🛠️ Technology Stack & Architecture Decisions
@@ -53,13 +52,6 @@ SQL Agent represents the next generation of database interaction tools, combinin
 - **Compliance**: Meets enterprise security standards (SOC 2, ISO 27001)
 - **User Control**: Users can manage credentials through Windows Control Panel
 
-### Task Scheduling: APScheduler with Multiple Triggers
-**Why APScheduler?**
-- **Enterprise Features**: Cron-like scheduling, job persistence, and distributed execution
-- **Database Integration**: Jobs stored in SQL Server for reliability and monitoring
-- **Flexible Triggers**: Hourly, daily, weekly, monthly, and custom interval scheduling
-- **Job Management**: Start, stop, pause, and modify jobs without application restart
-- **Monitoring**: Built-in job execution history and failure tracking
 
 ### Configuration Management: python-dotenv
 **Why Environment Variables?**
@@ -71,13 +63,12 @@ SQL Agent represents the next generation of database interaction tools, combinin
 ## Repository Layout
 ```
 sql-agent-cursor/
-├── app.py                # Flask app factory, blueprint registration, scheduler start
-├── routes.py             # REST API endpoints (DB connect, tables, columns, query, reports, scheduler)
-├── database.py           # DatabaseManager (connections, schema, CRUD for queries/scheduled queries)
+├── app.py                # Flask app factory, blueprint registration
+├── routes.py             # REST API endpoints (DB connect, tables, columns, query)
+├── database.py           # DatabaseManager (connections, schema, CRUD for queries)
 ├── ai_service.py         # OpenAI integration (NL→SQL, summaries)
 ├── config.py             # Centralized settings (env, defaults, keyring service/driver)
 ├── utils.py              # Validation, logging helpers, ODBC DSN parse/build/masking
-├── scheduler.py          # Query scheduler service (APScheduler)
 ├── templates/index.html  # UI layout
 ├── static/app.js         # Frontend logic (API calls, state, charts)
 ├── static/style.css      # Styling
@@ -100,30 +91,26 @@ Keyring details:
 
 ## Modules — What Each Does
 - `app.py`
-  - Creates Flask app, sets config, registers blueprint `api_bp`, starts APScheduler on boot, graceful shutdown.
+  - Creates Flask app, sets config, registers blueprint `api_bp`.
 - `routes.py`
-  - `POST /api/set_db`: Accepts either full DSN or fields (`driver, server, database, uid, pwd`). Stores PWD in keyring; saves only PWD‑less DSN + keyring account in session. Tests connection and configures scheduler.
+  - `POST /api/set_db`: Accepts either full DSN or fields (`driver, server, database, uid, pwd`). Stores PWD in keyring; saves only PWD‑less DSN + keyring account in session. Tests connection.
   - `GET /api/tables`, `POST /api/columns`: Schema discovery.
   - `POST /api/query`: NL→SQL via `ai_service`, validation, execution, persistence of history.
-  - `POST /api/report`: Explain or run report with chart inference.
-  - Scheduled queries: CRUD + run-now endpoints.
   - `POST /api/clear_db`: Removes password from keyring and clears session; UI returns to disconnected state.
   - Health/status endpoints.
 - `database.py`
   - Connection context manager; if keyring account present, retrieves password and builds DSN in memory.
   - Execute queries; infer query type; return structured results.
-  - Persist query history and scheduled queries in SQL Server tables (`saved_queries`, `scheduled_queries`).
+  - Persist query history in SQL Server table (`saved_queries`).
 - `ai_service.py`
   - Uses OpenAI to convert natural language to SQL; provides result summaries.
 - `utils.py`
   - `SQLValidator`: guards against destructive SQL.
   - `ODBCUtils`: parse/build/mask ODBC DSNs; mask dictionaries for logs.
   - `LoggingUtils`: basic logger setup and helpers.
-- `scheduler.py`
-  - Starts an APScheduler; (re)loads jobs after DB connect; supports hourly/daily/weekly/monthly triggers; run-now.
 - Frontend (`templates/index.html`, `static/app.js`, `static/style.css`)
   - Database connect form with fields (preferred) and optional DSN.
-  - Query builder, schema viewer, results grid, reports with charts, history, dashboard, scheduled queries UI.
+  - Query builder, schema viewer, results grid, charts, history, dashboard UI.
   - “Bağlantı bilgilerini kaldır” button to fully clear credentials and reset UI.
 
 ## 📋 Prerequisites
@@ -270,7 +257,7 @@ GO
 ```sql
 -- Minimum permissions needed:
 - db_datareader: Read data from tables
-- db_datawriter: Write query history and scheduled queries
+- db_datawriter: Write query history
 - VIEW DEFINITION: Access table/column metadata
 - EXECUTE: Run stored procedures (if needed)
 
@@ -376,7 +363,7 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 
 # Verify installation
-pip list | grep -E "(Flask|pyodbc|openai|APScheduler)"
+pip list | grep -E "(Flask|pyodbc|openai)"
 ```
 
 ### Step 4: Environment Configuration
@@ -412,9 +399,6 @@ HOST=127.0.0.1
 PORT=5000
 LOG_LEVEL=INFO
 
-# Scheduler Configuration
-SCHEDULER_TIMEZONE=UTC
-MAX_CONCURRENT_JOBS=10
 
 # Optional: Advanced Features
 ENABLE_QUERY_CACHING=True
@@ -441,7 +425,6 @@ python app.py
 
 # Expected output:
 # * Running on http://127.0.0.1:5000
-# * Scheduler started successfully
 # * Database connection ready
 ```
 
@@ -572,32 +555,6 @@ Complex business questions:
 - **Interactive Features**: Hover tooltips and zoom functionality
 - **Responsive Design**: Charts adapt to different screen sizes
 
-### ⏰ Scheduled Queries
-
-#### Creating Scheduled Jobs
-1. **Navigate to "Scheduled Queries" tab**
-2. **Click "Create New Schedule"**
-3. **Configure the schedule:**
-   - **Query**: Natural language question or SQL
-   - **Frequency**: Hourly, Daily, Weekly, Monthly
-   - **Time**: Specific execution time
-   - **Timezone**: UTC or local time
-4. **Set notification preferences**
-5. **Save and activate**
-
-#### Schedule Types
-- **Hourly**: Every hour at minute 0
-- **Daily**: Once per day at specified time
-- **Weekly**: Specific day of week and time
-- **Monthly**: Specific day of month and time
-- **Custom**: Cron-like expressions
-
-#### Job Management
-- **Run Now**: Execute job immediately for testing
-- **Toggle Active/Inactive**: Enable/disable jobs
-- **Edit Schedule**: Modify timing and query
-- **View History**: See execution logs and results
-- **Delete Job**: Remove scheduled queries
 
 ### 📈 Query History & Analytics
 
@@ -726,41 +683,12 @@ DELETE /api/queries/{id}
 # Removes query from history
 ```
 
-### Scheduled Queries
-```http
-POST /api/scheduled-queries
-Content-Type: application/json
-{
-  "name": "Daily Sales Report",
-  "query": "SELECT * FROM sales WHERE date = GETDATE()",
-  "schedule_type": "daily",
-  "schedule_time": "09:00",
-  "timezone": "UTC"
-}
-
-GET /api/scheduled-queries
-# Returns: List of all scheduled queries
-
-PUT /api/scheduled-queries/{id}
-# Updates existing scheduled query
-
-DELETE /api/scheduled-queries/{id}
-# Removes scheduled query
-
-POST /api/scheduled-queries/{id}/run-now
-# Executes scheduled query immediately
-
-POST /api/scheduled-queries/{id}/toggle
-# Enables/disables scheduled query
-```
 
 ### System Status
 ```http
 GET /api/health
 # Returns: Application health status
 
-GET /api/scheduler/status
-# Returns: Scheduler status and job information
 
 POST /api/clear_db
 # Clears database credentials and session
@@ -1078,13 +1006,6 @@ SQL Agent, yapay zeka gücünü kurumsal seviye güvenlik ve performans ile birl
 - **Uyumluluk**: Kurumsal güvenlik standartlarını karşılar (SOC 2, ISO 27001)
 - **Kullanıcı Kontrolü**: Kullanıcılar kimlik bilgilerini Windows Control Panel üzerinden yönetebilir
 
-### Görev Zamanlama: Çoklu Tetikleyiciler ile APScheduler
-**Neden APScheduler?**
-- **Kurumsal Özellikler**: Cron benzeri zamanlama, iş kalıcılığı ve dağıtık yürütme
-- **Veritabanı Entegrasyonu**: Güvenilirlik ve izleme için işler SQL Server'da saklanır
-- **Esnek Tetikleyiciler**: Saatlik, günlük, haftalık, aylık ve özel aralık zamanlaması
-- **İş Yönetimi**: Uygulama yeniden başlatmadan işleri başlat, durdur, duraklat ve değiştir
-- **İzleme**: Yerleşik iş yürütme geçmişi ve hata takibi
 
 ### Yapılandırma Yönetimi: python-dotenv
 **Neden Ortam Değişkenleri?**
@@ -1343,7 +1264,7 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 
 # Kurulumu doğrulayın
-pip list | grep -E "(Flask|pyodbc|openai|APScheduler)"
+pip list | grep -E "(Flask|pyodbc|openai)"
 ```
 
 ### Adım 4: Ortam Yapılandırması
@@ -1408,7 +1329,6 @@ python app.py
 
 # Beklenen çıktı:
 # * Running on http://127.0.0.1:5000
-# * Scheduler started successfully
 # * Database connection ready
 ```
 
@@ -1507,32 +1427,6 @@ Karmaşık iş soruları:
 - **Etkileşimli Özellikler**: Hover tooltip'leri ve zoom işlevselliği
 - **Duyarlı Tasarım**: Grafikler farklı ekran boyutlarına uyum sağlar
 
-### ⏰ Zamanlanmış Sorgular
-
-#### Zamanlanmış İşler Oluşturma
-1. **"Scheduled Queries" sekmesine gidin**
-2. **"Create New Schedule"e tıklayın**
-3. **Zamanlamayı yapılandırın:**
-   - **Query**: Doğal dil sorusu veya SQL
-   - **Frequency**: Saatlik, Günlük, Haftalık, Aylık
-   - **Time**: Belirli yürütme zamanı
-   - **Timezone**: UTC veya yerel saat
-4. **Bildirim tercihlerini ayarlayın**
-5. **Kaydedin ve etkinleştirin**
-
-#### Zamanlama Türleri
-- **Saatlik**: Her saat başında dakika 0'da
-- **Günlük**: Belirtilen zamanda günde bir kez
-- **Haftalık**: Haftanın belirli günü ve saati
-- **Aylık**: Ayın belirli günü ve saati
-- **Özel**: Cron benzeri ifadeler
-
-#### İş Yönetimi
-- **Şimdi Çalıştır**: Test için işi hemen yürütün
-- **Aktif/Pasif Değiştir**: İşleri etkinleştir/devre dışı bırak
-- **Zamanlamayı Düzenle**: Zamanlama ve sorguyu değiştirin
-- **Geçmişi Görüntüle**: Yürütme loglarını ve sonuçları görün
-- **İşi Sil**: Zamanlanmış sorguları kaldırın
 
 ### 🔒 Güvenlik ve Kimlik Bilgisi Yönetimi
 

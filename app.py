@@ -9,7 +9,6 @@ import atexit
 from config import Config
 from routes import api_bp, db_routes
 from utils import LoggingUtils
-from scheduler import query_scheduler
 
 
 def create_app() -> Flask:
@@ -44,27 +43,6 @@ def create_app() -> Flask:
     # Register blueprints
     app.register_blueprint(api_bp)
     
-    # Start scheduler immediately (jobs will be loaded when database connects)
-    try:
-        if not query_scheduler.scheduler.running:
-            query_scheduler.start()
-            logger.info("✅ Scheduler started at application startup")
-        else:
-            logger.info("ℹ️ Scheduler already running")
-    except Exception as e:
-        logger.error(f"❌ Failed to start scheduler at startup: {e}")
-    
-    # Jobs will be loaded when database connection is established (in routes.py)
-    
-    # Register shutdown handler
-    @atexit.register
-    def shutdown_scheduler():
-        """Shutdown scheduler on application exit."""
-        try:
-            query_scheduler.shutdown()
-            logger.info("Scheduler shut down successfully")
-        except Exception as e:
-            logger.error(f"Error shutting down scheduler: {e}")
     
     # Register main route
     @app.route("/")

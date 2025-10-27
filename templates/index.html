@@ -21,8 +21,6 @@
                     <button class="nav-btn active" data-page="query-page">🚀 Sorgu Çalıştır</button>
                     <button class="nav-btn" data-page="history-page">📚 Sorgularım</button>
                     <button class="nav-btn" data-page="dashboard-page">📊 Dashboard</button>
-                    <button class="nav-btn" data-page="reports-page">📈 Raporlarım</button>
-                    <button class="nav-btn" data-page="scheduled-page">⏰ Zamanlanmış Sorgular</button>
                 </nav>
             </div>
 
@@ -147,53 +145,6 @@
                 </section>
             </div>
 
-            <!-- Reports Page Content -->
-            <div id="reports-page" class="page-content">
-                <section class="section" id="reports-section">
-                    <h2>📈 Raporlarım</h2>
-
-                    <div class="input-group">
-                        <label for="report-question">Rapor Sorusu (Doğal Dil):</label>
-                        <textarea 
-                            id="report-question"
-                            rows="3"
-                            class="textarea-field"
-                            placeholder="Örnek: Aylara göre müşteri sayısını getir"
-                        ></textarea>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="report-tables">Tablolar (Ctrl/Command ile çoklu seçim):</label>
-                        <select id="report-tables" multiple class="select-field" disabled>
-                            <option value="">Önce veritabanı bağlantısını kurun</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="report-chart-type">Grafik Tercihi:</label>
-                        <select id="report-chart-type" class="select-field">
-                            <option value="auto" selected>Otomatik</option>
-                            <option value="bar">Bar</option>
-                            <option value="line">Çizgi</option>
-                            <option value="pie">Pasta</option>
-                            <option value="doughnut">Halka</option>
-                            <option value="area">Alan</option>
-                        </select>
-                    </div>
-
-                    <div class="button-group">
-                        <button id="generate-report-btn" class="btn btn-success" disabled>📈 Rapor Oluştur</button>
-                    </div>
-
-                    <section class="section" id="report-results-section">
-                        <h3>📊 Rapor Sonuçları</h3>
-                        <div id="report-results" class="results-container">
-                            <p class="placeholder">Rapor sonucu burada görünecek</p>
-                        </div>
-                        <canvas id="report-chart" style="display: none; margin-top: 16px;"></canvas>
-                    </section>
-                </section>
-            </div>
 
             <!-- Query History Page Content -->
             <div id="history-page" class="page-content">
@@ -259,94 +210,6 @@
                 </section>
             </div>
 
-            <!-- Scheduled Queries Page Content -->
-            <div id="scheduled-page" class="page-content">
-                <section class="section" id="scheduled-queries-section">
-                    <h2>⏰ Zamanlanmış Sorgular</h2>
-                    
-                    <!-- Create New Scheduled Query -->
-                    <div class="scheduled-query-form" id="scheduled-form-container">
-                        <h3>➕ Yeni Zamanlanmış Sorgu Oluştur</h3>
-                        
-                        <div class="input-group">
-                            <label for="scheduled-question">Sorgu (Doğal Dil):</label>
-                            <textarea 
-                                id="scheduled-question" 
-                                rows="3" 
-                                class="textarea-field"
-                                placeholder="Örnek: Günlük toplam satış tutarı"
-                            ></textarea>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="scheduled-tables">Tablolar (Ctrl ile çoklu seçim):</label>
-                            <select id="scheduled-tables" multiple class="select-field" size="8">
-                                <option value="" disabled>Veritabanı bağlantısı kurun</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="schedule-type">Zamanlama Tipi:</label>
-                            <select id="schedule-type" class="select-field">
-                                <option value="hourly">🕐 Saatlik (Her saat başı)</option>
-                                <option value="daily" selected>📅 Günlük (Belirli saatte)</option>
-                                <option value="weekly">📆 Haftalık (Belirli gün ve saatte)</option>
-                                <option value="monthly">🗓️ Aylık (Ayın belirli günü)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-group" id="time-input-group">
-                            <label for="schedule-time">Saat (HH:MM):</label>
-                            <input 
-                                type="time" 
-                                id="schedule-time" 
-                                class="input-field"
-                                value="09:00"
-                            >
-                        </div>
-                        
-                        <div class="input-group" id="day-input-group" style="display: none;">
-                            <label for="schedule-day">Gün:</label>
-                            <select id="schedule-day" class="select-field">
-                                <option value="0">Pazartesi</option>
-                                <option value="1">Salı</option>
-                                <option value="2">Çarşamba</option>
-                                <option value="3">Perşembe</option>
-                                <option value="4">Cuma</option>
-                                <option value="5">Cumartesi</option>
-                                <option value="6">Pazar</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-group" id="month-day-input-group" style="display: none;">
-                            <label for="schedule-month-day">Ayın Günü (1-31):</label>
-                            <input 
-                                type="number" 
-                                id="schedule-month-day" 
-                                class="input-field"
-                                min="1"
-                                max="31"
-                                value="1"
-                            >
-                        </div>
-                        
-                        <button id="create-scheduled-btn" class="btn btn-success btn-large" disabled>
-                            ⏰ Zamanlanmış Sorgu Oluştur
-                        </button>
-                    </div>
-                    
-                    <!-- Scheduled Queries List -->
-                    <div class="scheduled-queries-list-section">
-                        <h3>📋 Kayıtlı Zamanlanmış Sorgular</h3>
-                        <div class="query-history-controls">
-                            <button id="refresh-scheduled-btn" class="btn btn-primary">🔄 Yenile</button>
-                        </div>
-                        <div id="scheduled-queries-list" class="scheduled-queries-container">
-                            <p class="placeholder">Zamanlanmış sorgular yükleniyor...</p>
-                        </div>
-                    </div>
-                </section>
-            </div>
         </main>
 
         <footer class="footer">
