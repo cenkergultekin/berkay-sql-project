@@ -4,8 +4,8 @@ Handles OpenAI API interactions and prompt engineering.
 """
 from typing import List, Dict
 from openai import OpenAI
-from models import DatabaseSchema, QueryRequest
-from config import Config
+from backend.models.models import DatabaseSchema, QueryRequest
+from backend.config.config import Config
 import logging
 
 logger = logging.getLogger(__name__)

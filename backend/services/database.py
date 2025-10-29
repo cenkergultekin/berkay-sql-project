@@ -5,10 +5,10 @@ Handles all database-related functionality.
 import pyodbc
 from typing import List, Dict, Any, Optional
 from contextlib import contextmanager
-from models import DatabaseConnection, TableInfo, DatabaseSchema, QueryResponse, QueryType, SavedQuery
-from config import Config
+from backend.models.models import DatabaseConnection, TableInfo, DatabaseSchema, QueryResponse, QueryType, SavedQuery
+from backend.config.config import Config
 import logging
-from utils import ODBCUtils
+from backend.core.utils import ODBCUtils
 import keyring
 
 logger = logging.getLogger(__name__)

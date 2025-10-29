@@ -6,9 +6,9 @@ from flask import Flask, render_template
 import logging
 import atexit
 
-from config import Config
-from routes import api_bp, db_routes
-from utils import LoggingUtils
+from backend.config.config import Config
+from backend.routes.routes import api_bp, db_routes
+from backend.core.utils import LoggingUtils
 
 
 def create_app() -> Flask:
@@ -26,8 +26,10 @@ def create_app() -> Flask:
     LoggingUtils.setup_logging()
     logger = logging.getLogger(__name__)
     
-    # Create Flask app
-    app = Flask(__name__)
+    # Create Flask app with custom template and static folders
+    app = Flask(__name__, 
+                template_folder='frontend/templates',
+                static_folder='frontend/static')
     
     # Configure app
     app.config['SECRET_KEY'] = Config.SECRET_KEY

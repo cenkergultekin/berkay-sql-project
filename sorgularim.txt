@@ -21,3 +21,25 @@ SELECT TOP 5 EmployeeID FROM EmployeeTerritories
 📊 SONUÇLAR: 5 satır
 Veri: [{'EmployeeID': 1}, {'EmployeeID': 1}, {'EmployeeID': 2}, {'EmployeeID': 2}, {'EmployeeID': 2}]
 
+
+================================================================================
+SORGU #3
+TARİH: 2025-10-29 17:03:06 +03
+DURUM: ✅ BAŞARILI
+================================================================================
+
+📝 SORU:
+fiyatı en yüksek 3 kategori ismi getir
+
+📋 TABLOLAR:
+Categories, Products
+
+🔍 SQL SORGUSU:
+SELECT TOP 3 c.CategoryName
+FROM Categories c
+JOIN Products p ON c.CategoryID = p.CategoryID
+ORDER BY p.UnitPrice DESC;
+
+📊 SONUÇLAR: 3 satır
+Veri: [{'CategoryName': 'Beverages'}, {'CategoryName': 'Meat/Poultry'}, {'CategoryName': 'Meat/Poultry'}]
+

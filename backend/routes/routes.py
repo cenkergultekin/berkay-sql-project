@@ -6,14 +6,14 @@ from flask import Blueprint, request, jsonify, session
 from typing import Dict, Any
 import logging
 
-from models import DatabaseConnection, QueryRequest, SavedQuery
-from database import DatabaseManager
-from ai_service import AIService
-from utils import (
+from backend.models.models import DatabaseConnection, QueryRequest, SavedQuery
+from backend.services.database import DatabaseManager
+from backend.services.ai_service import AIService
+from backend.core.utils import (
     ValidationError, SQLValidator, StringUtils,
     ResponseFormatter, LoggingUtils, ODBCUtils
 )
-from config import Config
+from backend.config.config import Config
 import keyring
 
 logger = logging.getLogger(__name__)
