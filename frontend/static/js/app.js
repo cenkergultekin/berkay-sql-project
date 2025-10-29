@@ -454,11 +454,11 @@ class NIQApp {
         if (targetSection) {
             const headerHeight = document.querySelector('.minimal-header')?.offsetHeight || 0;
             const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
-            
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
+                
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
         }
     }
 
