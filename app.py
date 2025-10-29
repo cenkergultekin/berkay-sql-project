@@ -2,9 +2,22 @@
 Main Flask application factory.
 Creates and configures the Flask application.
 """
+import sys
+import os
 from flask import Flask, render_template
 import logging
 import atexit
+
+# PyInstaller için path düzeltmesi
+if getattr(sys, 'frozen', False):
+    # PyInstaller bundle içindeyiz
+    bundle_dir = sys._MEIPASS
+    template_folder = os.path.join(bundle_dir, 'frontend', 'templates')
+    static_folder = os.path.join(bundle_dir, 'frontend', 'static')
+else:
+    # Normal Python çalıştırması
+    template_folder = 'frontend/templates'
+    static_folder = 'frontend/static'
 
 from backend.config.config import Config
 from backend.routes.routes import api_bp, db_routes
@@ -26,21 +39,16 @@ def create_app() -> Flask:
     LoggingUtils.setup_logging()
     logger = logging.getLogger(__name__)
     
-    # Create Flask app with custom template and static folders
+    # Create Flask app with dynamic template and static folders
     app = Flask(__name__, 
-                template_folder='frontend/templates',
-                static_folder='frontend/static')
+                template_folder=template_folder,
+                static_folder=static_folder)
     
     # Configure app
     app.config['SECRET_KEY'] = Config.SECRET_KEY
-    app.config['DEBUG'] = Config.DEBUG
-    # Ensure templates/static reload so UI changes appear immediately
-    app.config['TEMPLATES_AUTO_RELOAD'] = True
+    app.config['DEBUG'] = False  # Desktop sürümde debug kapalı
+    app.config['TEMPLATES_AUTO_RELOAD'] = False
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-    try:
-        app.jinja_env.cache = {}
-    except Exception:
-        pass
     
     # Register blueprints
     app.register_blueprint(api_bp)
@@ -73,4 +81,4 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(debug=Config.DEBUG, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='127.0.0.1', port=5000)
