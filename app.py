@@ -12,8 +12,41 @@ import atexit
 if getattr(sys, 'frozen', False):
     # PyInstaller bundle içindeyiz
     bundle_dir = sys._MEIPASS
+    exe_dir = os.path.dirname(sys.executable)
+    
+    # Working directory'yi executable'ın bulunduğu dizine ayarla
+    os.chdir(exe_dir)
+    
+    # Template ve static klasörlerini bundle içinden al
     template_folder = os.path.join(bundle_dir, 'frontend', 'templates')
     static_folder = os.path.join(bundle_dir, 'frontend', 'static')
+    
+    # Debug için path'leri yazdır ve dosyaya kaydet
+    debug_info = f"""
+=== SQL Agent Debug Info ===
+Bundle dir: {bundle_dir}
+Template folder: {template_folder}
+Static folder: {static_folder}
+Template exists: {os.path.exists(template_folder)}
+Static exists: {os.path.exists(static_folder)}
+Working dir: {os.getcwd()}
+Exe dir: {exe_dir}
+"""
+    print(debug_info)
+    
+    # Debug bilgilerini dosyaya kaydet
+    try:
+        with open('debug.log', 'w', encoding='utf-8') as f:
+            f.write(debug_info)
+            if os.path.exists(template_folder):
+                f.write(f"Template files: {os.listdir(template_folder)}\n")
+            if os.path.exists(static_folder):
+                f.write(f"Static files: {os.listdir(static_folder)}\n")
+    except Exception as e:
+        print(f"Debug log yazma hatası: {e}")
+    
+    # Uygulama verilerini exe dizininde sakla
+    os.environ['SQL_AGENT_HOME'] = exe_dir
 else:
     # Normal Python çalıştırması
     template_folder = 'frontend/templates'

@@ -3,11 +3,27 @@ Configuration management for SQL Agent application.
 Handles environment variables and application settings.
 """
 import os
+import sys
 from dotenv import load_dotenv
 from typing import Optional
 
 # Load environment variables
-load_dotenv()
+# PyInstaller için .env dosyasını bundle içinden yükle
+if getattr(sys, 'frozen', False):
+    # PyInstaller bundle içindeyiz
+    import sys
+    bundle_dir = sys._MEIPASS
+    env_path = os.path.join(bundle_dir, '.env')
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+    else:
+        # .env bulunamazsa, executable'ın yanında ara
+        exe_dir = os.path.dirname(sys.executable)
+        env_path = os.path.join(exe_dir, '.env')
+        if os.path.exists(env_path):
+            load_dotenv(env_path)
+else:
+    load_dotenv()
 
 
 class Config:

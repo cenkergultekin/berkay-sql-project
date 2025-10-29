@@ -10,6 +10,7 @@ a = Analysis(
         ('frontend/templates', 'frontend/templates'),
         ('frontend/static', 'frontend/static'),
         ('backend', 'backend'),
+        ('.env', '.'),
     ],
     hiddenimports=[
         'backend.config.config',

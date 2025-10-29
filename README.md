@@ -1,6 +1,19 @@
-# SQL Agent (MS SQL) — Enterprise-Grade Natural Language to SQL Platform
+# SQL Agent Desktop — Enterprise-Grade Natural Language to SQL Platform
 
-A sophisticated, enterprise-ready web application that transforms natural language questions into optimized SQL queries for Microsoft SQL Server. Built with modern software engineering principles, featuring modular architecture, intelligent background scheduling, and military-grade security through OS-integrated credential management.
+A sophisticated, enterprise-ready desktop application that transforms natural language questions into optimized SQL queries for Microsoft SQL Server. Built with modern software engineering principles, featuring modular architecture, professional installer, and military-grade security through OS-integrated credential management.
+
+## 📦 Installation Options
+
+### For End Users (Recommended)
+Download and run the Windows installer: **SQLAgent_Setup.exe**
+- ✅ One-click installation
+- ✅ Desktop shortcuts
+- ✅ Start menu integration  
+- ✅ Automatic uninstaller
+- ✅ ODBC driver detection
+
+### For Developers
+Clone the repository and run from source code (see Development Setup below)
 
 ## 🚀 Overview
 
