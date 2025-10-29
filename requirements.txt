@@ -12,6 +12,11 @@ openai>=2.3.0
 # Environment management
 python-dotenv>=1.1.1
 
+# Desktop GUI (PyQt5)
+PyQt5>=5.15.10
+PyQtWebEngine>=5.15.6
+requests>=2.31.0
+
 # Task scheduling
 
 # Development dependencies (optional)

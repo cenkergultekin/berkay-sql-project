@@ -5,6 +5,10 @@ dist/
 *.pkg
 *.pyz
 
+# Large executable files (use GitHub Releases instead)
+NIQ-Desktop.exe
+SQLAgent.exe
+
 # Python cache
 __pycache__/
 *.pyc

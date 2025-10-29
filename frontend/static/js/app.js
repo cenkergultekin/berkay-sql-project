@@ -1,14 +1,17 @@
 /**
- * SQL Agent Frontend Application
+ * NIQ (Natural Intelligence Query) Frontend Application
  * Clean Code Architecture - Frontend JavaScript
  */
 
-class SQLAgentApp {
+class NIQApp {
     constructor() {
         this.apiBaseUrl = '/api';
         this.elements = this.initializeElements();
         this.state = this.initializeState();
         this.bindEvents();
+        this.initializeSidebar();
+        this.initializeScrollAnimations();
+        this.initializeDashboard();
         this.initializeApp();
     }
 
@@ -17,6 +20,18 @@ class SQLAgentApp {
      */
     initializeElements() {
         const elements = {
+            // Sidebar elements
+            sidebar: document.getElementById('sidebar'),
+            sidebarToggle: document.getElementById('sidebar-toggle'),
+            sidebarNavItems: document.querySelectorAll('.sidebar-nav-item'),
+            
+            // Header element
+            header: document.getElementById('header'),
+            
+            // Progress bar elements (removed)
+            // progressFill: document.getElementById('progress-fill'),
+            // progressSteps: document.querySelectorAll('.progress-step'),
+            
             // Database connection elements
             dbConnInput: document.getElementById('db_conn'),
             dbDriverInput: document.getElementById('db_driver'),
@@ -43,7 +58,6 @@ class SQLAgentApp {
             resultsDiv: document.getElementById('results'),
             
             // Navigation elements
-            navBtns: document.querySelectorAll('.nav-btn'),
             pageContents: document.querySelectorAll('.page-content'),
             
             // Saved queries elements
@@ -61,11 +75,16 @@ class SQLAgentApp {
             chartInfo: document.getElementById('chart-info'),
             chartDetails: document.getElementById('chart-details'),
             
+            // Sections for scroll reveal
+            sections: document.querySelectorAll('.section'),
+            
+            // Header elements
+            header: document.querySelector('.modern-header'),
         };
 
         // Debug: Check for missing elements (only log if element is actually missing)
         for (const [name, element] of Object.entries(elements)) {
-            if (!element) {
+            if (!element && !['sections', 'sidebarNavItems', 'pageContents', 'chartTypeBtns'].includes(name)) {
                 console.warn(`Element not found: ${name} - Bu element opsiyonel olabilir`);
             }
         }
@@ -88,6 +107,362 @@ class SQLAgentApp {
     }
 
     /**
+     * Initialize sidebar toggle functionality
+     */
+    initializeSidebar() {
+        // Load sidebar state from localStorage
+        const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        
+        if (!sidebarCollapsed) {
+            document.body.classList.remove('sidebar-collapsed');
+            if (this.elements.sidebar) this.elements.sidebar.classList.remove('collapsed');
+            if (this.elements.sidebarToggle) this.elements.sidebarToggle.classList.add('active');
+        }
+        
+        // Sidebar toggle click event
+        if (this.elements.sidebarToggle) {
+            this.elements.sidebarToggle.addEventListener('click', () => {
+                this.toggleSidebar();
+            });
+        }
+        
+        // Sidebar navigation items
+        if (this.elements.sidebarNavItems) {
+            this.elements.sidebarNavItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const page = e.currentTarget.dataset.page;
+                    this.switchPage(page);
+                });
+            });
+        }
+    }
+
+    /**
+     * Toggle sidebar open/closed
+     */
+    toggleSidebar() {
+        const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+        if (this.elements.sidebar) this.elements.sidebar.classList.toggle('collapsed');
+        if (this.elements.sidebarToggle) this.elements.sidebarToggle.classList.toggle('active');
+        
+        // Save state to localStorage
+        localStorage.setItem('sidebarCollapsed', isCollapsed);
+    }
+
+    /**
+     * Initialize scroll animations
+     */
+    initializeScrollAnimations() {
+        // Sticky header shrink on scroll
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                if (this.elements.header) this.elements.header.classList.add('shrink');
+            } else {
+                if (this.elements.header) this.elements.header.classList.remove('shrink');
+            }
+            
+            lastScroll = currentScroll;
+        });
+        
+        // Intersection Observer for section reveal animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all sections
+        this.elements.sections.forEach(section => {
+            observer.observe(section);
+        });
+    }
+
+    /**
+     * Initialize dashboard functionality
+     */
+    initializeDashboard() {
+        // Render dynamic quick actions
+        this.renderQuickActions();
+        
+        // Update dashboard stats
+        this.updateDashboardStats();
+        
+        // Load recent activities
+        this.loadRecentActivities();
+    }
+
+    /**
+     * Render quick actions based on connection status
+     */
+    renderQuickActions() {
+        const actionsGrid = document.getElementById('dynamic-actions-grid');
+        if (!actionsGrid) return;
+
+        const actions = this.getOrderedActions();
+        
+        const actionsHtml = actions.map(action => `
+            <button class="action-card ${action.primary ? 'primary' : ''}" data-action="${action.id}">
+                <div class="action-icon">
+                    <div class="${action.icon}"></div>
+                </div>
+                <div class="action-content">
+                    <h3>${action.title}</h3>
+                    <p>${action.description}</p>
+                </div>
+                <div class="action-arrow">
+                    <div class="arrow-icon"></div>
+                </div>
+            </button>
+        `).join('');
+
+        actionsGrid.innerHTML = actionsHtml;
+
+        // Add event listeners to new action cards
+        const actionCards = actionsGrid.querySelectorAll('.action-card');
+        actionCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                const action = e.currentTarget.dataset.action;
+                this.handleQuickAction(action);
+            });
+        });
+    }
+
+    /**
+     * Get ordered actions based on connection status
+     */
+    getOrderedActions() {
+        const baseActions = [
+            {
+                id: 'connect-db',
+                icon: 'icon-connect',
+                title: 'Veritabanı Bağla',
+                description: 'SQL Server bağlantısı kur',
+                primary: !this.state.isConnected,
+                priority: this.state.isConnected ? 4 : 1
+            },
+            {
+                id: 'new-query',
+                icon: 'icon-query',
+                title: 'Yeni Sorgu',
+                description: 'Doğal dille SQL oluştur',
+                primary: this.state.isConnected,
+                priority: this.state.isConnected ? 1 : 2
+            },
+            {
+                id: 'view-history',
+                icon: 'icon-history',
+                title: 'Sorgu Geçmişi',
+                description: 'Önceki sorgularını görüntüle',
+                primary: false,
+                priority: 3
+            },
+            {
+                id: 'view-charts',
+                icon: 'icon-charts',
+                title: 'Grafikler',
+                description: 'Veri görselleştirmeleri',
+                primary: false,
+                priority: 4
+            }
+        ];
+
+        // Sort by priority
+        return baseActions.sort((a, b) => a.priority - b.priority);
+    }
+
+
+    /**
+     * Handle quick action clicks
+     */
+    handleQuickAction(action) {
+        switch(action) {
+            case 'new-query':
+                this.switchPage('query-page');
+                // Focus on question textarea if exists
+                setTimeout(() => {
+                    const questionInput = document.getElementById('question');
+                    if (questionInput) questionInput.focus();
+                }, 300);
+                break;
+            case 'connect-db':
+                this.switchPage('query-page');
+                // Scroll to database section
+                setTimeout(() => {
+                    this.scrollToSection('db-section');
+                }, 300);
+                break;
+            case 'view-history':
+                this.switchPage('history-page');
+                break;
+            case 'view-charts':
+                this.switchPage('charts-page');
+                break;
+        }
+    }
+
+    /**
+     * Update dashboard statistics
+     */
+    updateDashboardStats() {
+        // Update connection status in header
+        this.updateConnectionStatus();
+        
+        // Update stats from localStorage or API
+        this.updateStatFromStorage();
+        
+        // Re-render quick actions with new connection status
+        this.renderQuickActions();
+    }
+
+    /**
+     * Update connection status in header
+     */
+    updateConnectionStatus() {
+        const connectionBadge = document.getElementById('connection-badge');
+        const badgeText = connectionBadge?.querySelector('.badge-text');
+        
+        if (this.state.isConnected) {
+            connectionBadge?.classList.add('connected');
+            if (badgeText) badgeText.textContent = `Bağlı: ${this.state.currentDatabase || 'Veritabanı'}`;
+        } else {
+            connectionBadge?.classList.remove('connected');
+            if (badgeText) badgeText.textContent = 'Bağlantı Yok';
+        }
+    }
+
+    /**
+     * Update stats from localStorage
+     */
+    updateStatFromStorage() {
+        try {
+            const queryHistory = JSON.parse(localStorage.getItem('niq_query_history') || '[]');
+            const totalQueries = queryHistory.length;
+            const successfulQueries = queryHistory.filter(q => q.success).length;
+            const successRate = totalQueries > 0 ? Math.round((successfulQueries / totalQueries) * 100) : 0;
+            const lastQuery = queryHistory.length > 0 ? queryHistory[0].question?.substring(0, 30) + '...' : '-';
+
+            // Update DOM elements
+            const totalQueriesEl = document.getElementById('total-queries');
+            const connectedDbEl = document.getElementById('connected-db');
+            const lastQueryEl = document.getElementById('last-query');
+            const successRateEl = document.getElementById('success-rate');
+
+            if (totalQueriesEl) totalQueriesEl.textContent = totalQueries;
+            if (connectedDbEl) connectedDbEl.textContent = this.state.currentDatabase || '-';
+            if (lastQueryEl) lastQueryEl.textContent = lastQuery;
+            if (successRateEl) successRateEl.textContent = totalQueries > 0 ? `%${successRate}` : '-';
+        } catch (error) {
+            console.warn('Error updating stats from storage:', error);
+        }
+    }
+
+    /**
+     * Load recent activities
+     */
+    loadRecentActivities() {
+        try {
+            const queryHistory = JSON.parse(localStorage.getItem('niq_query_history') || '[]');
+            const recentActivities = queryHistory.slice(0, 5); // Son 5 aktivite
+
+            const activitiesContainer = document.getElementById('recent-activities');
+            if (!activitiesContainer) return;
+
+            if (recentActivities.length === 0) {
+                activitiesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <div class="icon-activity"></div>
+                        </div>
+                        <h3>Henüz aktivite yok</h3>
+                        <p>İlk sorgunuzu oluşturun ve aktivitelerinizi burada görün</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const activitiesHtml = recentActivities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <div class="${activity.success ? 'icon-success' : 'icon-error'}"></div>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-question">${activity.question}</div>
+                        <div class="activity-time">${this.formatTime(activity.timestamp)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            activitiesContainer.innerHTML = activitiesHtml;
+        } catch (error) {
+            console.warn('Error loading recent activities:', error);
+        }
+    }
+
+    /**
+     * Save query to localStorage history
+     */
+    saveQueryToHistory(question, success, sql) {
+        try {
+            const queryHistory = JSON.parse(localStorage.getItem('niq_query_history') || '[]');
+            const newQuery = {
+                question: question,
+                success: success,
+                sql: sql,
+                timestamp: Date.now(),
+                database: this.state.currentDatabase,
+                tables: this.state.selectedTables
+            };
+            
+            queryHistory.unshift(newQuery);
+            // Keep only last 100 queries
+            const trimmedHistory = queryHistory.slice(0, 100);
+            localStorage.setItem('niq_query_history', JSON.stringify(trimmedHistory));
+        } catch (error) {
+            console.warn('Error saving query to history:', error);
+        }
+    }
+
+    /**
+     * Format timestamp for display
+     */
+    formatTime(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+        
+        if (diff < 60000) return 'Az önce';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)} dakika önce`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)} saat önce`;
+        return date.toLocaleDateString('tr-TR');
+    }
+
+    /**
+     * Smooth scroll to section
+     */
+    scrollToSection(sectionId) {
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            const headerHeight = document.querySelector('.minimal-header')?.offsetHeight || 0;
+            const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
+            
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    /**
      * Bind event listeners
      */
     bindEvents() {
@@ -107,11 +482,6 @@ class SQLAgentApp {
         if (this.elements.clearBtn) {
             this.elements.clearBtn.addEventListener('click', () => this.clearResults());
         }
-        
-        // Page navigation
-        this.elements.navBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => this.switchPage(e.target.dataset.page));
-        });
         
         // Saved queries (opsiyonel elementler)
         if (this.elements.refreshQueriesBtn) {
@@ -268,10 +638,19 @@ class SQLAgentApp {
 
             if (response.success) {
                 this.state.isConnected = true;
+                this.state.currentDatabase = database;
                 this.showStatus('Veritabanı bağlantısı başarılı!', 'success');
                 // Clear password input in UI memory for safety
                 if (this.elements.dbPasswordInput) this.elements.dbPasswordInput.value = '';
                 this.elements.tableSelect.disabled = false;
+                
+                // Show schema section when tables are loaded
+                const schemaSection = document.getElementById('schema-section');
+                if (schemaSection) schemaSection.style.display = 'block';
+                
+                // Update dashboard stats
+                this.updateDashboardStats();
+                
                 await this.loadTables();
                 // Load saved queries after connection if element exists
                 if (this.elements.savedQueriesList) {
@@ -399,6 +778,9 @@ class SQLAgentApp {
             return;
         }
 
+        // Scroll to results section
+        this.scrollToSection('results-section');
+        
         this.setLoading(true);
         this.showStatus('Sorgu işleniyor...', 'info');
 
@@ -410,8 +792,13 @@ class SQLAgentApp {
 
             this.displayResults(response);
             
+            // Save to localStorage for dashboard stats
+            this.saveQueryToHistory(question, response.success, response.sql);
+            
             if (response.success) {
                 this.showStatus('Sorgu başarıyla çalıştırıldı', 'success');
+                // Update dashboard stats
+                this.updateDashboardStats();
             } else {
                 this.showStatus(`Sorgu hatası: ${response.error}`, 'error');
             }
@@ -447,13 +834,13 @@ class SQLAgentApp {
         if (results.length === 0) {
             this.elements.resultsDiv.innerHTML = `
                 <div class="result-section">
-                    <h3>📊 Sorgu Sonuçları</h3>
+                    <h3>Sorgu Sonuçları</h3>
                     <div class="sql-query">
                         <strong>SQL:</strong>
                         <pre>${sql}</pre>
                     </div>
                     <div class="no-results">
-                        <p>❌ Sorgu sonucu bulunamadı</p>
+                        <p>Sorgu sonucu bulunamadı</p>
                     </div>
                 </div>
             `;
@@ -467,7 +854,7 @@ class SQLAgentApp {
 
         this.elements.resultsDiv.innerHTML = `
             <div class="result-section">
-                <h3>📊 Sorgu Sonuçları (${results.length} satır)</h3>
+                <h3>Sorgu Sonuçları (${results.length} satır)</h3>
                 <div class="sql-query">
                     <strong>SQL:</strong>
                     <pre>${sql}</pre>
@@ -492,7 +879,7 @@ class SQLAgentApp {
     displayMessageResult(message, sql) {
         this.elements.resultsDiv.innerHTML = `
             <div class="result-section">
-                <h3>✅ Sorgu Tamamlandı</h3>
+                <h3>Sorgu Tamamlandı</h3>
                 <div class="sql-query">
                     <strong>SQL:</strong>
                     <pre>${sql}</pre>
@@ -510,7 +897,7 @@ class SQLAgentApp {
     displayErrorResult(error, sql) {
         this.elements.resultsDiv.innerHTML = `
             <div class="result-section">
-                <h3>❌ Sorgu Hatası</h3>
+                <h3>Sorgu Hatası</h3>
                 <div class="sql-query">
                     <strong>SQL:</strong>
                     <pre>${sql || 'SQL oluşturulamadı'}</pre>
@@ -526,7 +913,15 @@ class SQLAgentApp {
      * Clear results and form
      */
     clearResults() {
-        this.elements.resultsDiv.innerHTML = '<p class="placeholder">Sorgu sonuçları burada görünecek</p>';
+        this.elements.resultsDiv.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <div class="icon-chart"></div>
+                </div>
+                <h3>Sorgu sonuçlarınız burada görünecek</h3>
+                <p>Yukarıdan bir sorgu çalıştırın ve sonuçları görün</p>
+            </div>
+        `;
         this.elements.questionTextarea.value = '';
         this.showStatus('Sonuçlar temizlendi', 'info');
     }
@@ -677,15 +1072,18 @@ class SQLAgentApp {
      * Switch between pages
      */
     switchPage(pageName) {
-        // Update navigation buttons
-        this.elements.navBtns.forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.page === pageName);
-        });
+        // Update sidebar navigation items
+        if (this.elements.sidebarNavItems) {
+            this.elements.sidebarNavItems.forEach(item => {
+                item.classList.toggle('active', item.dataset.page === pageName);
+            });
+        }
 
         // Update page content
         this.elements.pageContents.forEach(content => {
             content.classList.toggle('active', content.id === pageName);
         });
+
 
         // Load saved queries when switching to history page
         if (pageName === 'history-page' && this.state.isConnected && this.elements.savedQueriesList) {
@@ -697,6 +1095,10 @@ class SQLAgentApp {
             this.loadDashboard();
         }
         
+        // Load charts data when switching to charts page
+        if (pageName === 'charts-page' && this.state.isConnected) {
+            this.loadDashboard(); // Charts page uses same data loading
+        }
     }
 
     /**
@@ -728,7 +1130,9 @@ class SQLAgentApp {
             } else {
                 this.elements.savedQueriesList.innerHTML = `
                     <div class="no-saved-queries">
-                        <div class="no-saved-queries-icon">❌</div>
+                        <div class="no-saved-queries-icon">
+                            <div class="icon-error"></div>
+                        </div>
                         <p>Sorgular yüklenirken hata oluştu: ${response.error}</p>
                     </div>
                 `;
@@ -736,7 +1140,9 @@ class SQLAgentApp {
         } catch (error) {
             this.elements.savedQueriesList.innerHTML = `
                 <div class="no-saved-queries">
-                    <div class="no-saved-queries-icon">❌</div>
+                    <div class="no-saved-queries-icon">
+                        <div class="icon-error"></div>
+                    </div>
                     <p>Sorgular yüklenirken hata oluştu: ${error.message}</p>
                 </div>
             `;
@@ -755,7 +1161,9 @@ class SQLAgentApp {
         if (queries.length === 0) {
             this.elements.savedQueriesList.innerHTML = `
                 <div class="no-saved-queries">
-                    <div class="no-saved-queries-icon">📝</div>
+                    <div class="no-saved-queries-icon">
+                        <div class="icon-activity"></div>
+                    </div>
                     <p>Henüz kayıtlı sorgu bulunmuyor</p>
                     <p>İlk sorgunuzu oluşturun ve otomatik olarak kaydedilecek</p>
                 </div>
@@ -772,8 +1180,8 @@ class SQLAgentApp {
      */
     createSavedQueryHTML(query) {
         const createdDate = new Date(query.created_at).toLocaleString('tr-TR');
+        const statusText = query.is_successful ? 'Başarılı' : 'Hatalı';
         const statusClass = query.is_successful ? 'success' : 'error';
-        const statusText = query.is_successful ? '✅ Başarılı' : '❌ Hatalı';
         
         const tablesHtml = query.tables_used.map(table => 
             `<span class="saved-query-table-tag">${this.escapeHtml(table)}</span>`
@@ -797,7 +1205,7 @@ class SQLAgentApp {
 
             resultsHtml = `
                 <div class="saved-query-results">
-                    <h4>📊 Sorgu Sonuçları (${query.query_results.length} satır):</h4>
+                    <h4>Sorgu Sonuçları (${query.query_results.length} satır):</h4>
                     <div class="table-container">
                         <table class="results-table">
                             <thead>
@@ -815,7 +1223,7 @@ class SQLAgentApp {
             // Non-SELECT query with message
             resultsHtml = `
                 <div class="saved-query-success">
-                    <h4>✅ Sorgu Başarıyla Çalıştırıldı</h4>
+                    <h4>Sorgu Başarıyla Çalıştırıldı</h4>
                     <p>${this.escapeHtml(query.result_message)}</p>
                 </div>
             `;
@@ -823,7 +1231,7 @@ class SQLAgentApp {
             // SELECT query with no results
             resultsHtml = `
                 <div class="saved-query-no-results">
-                    <h4>📊 Sorgu Sonuçları:</h4>
+                    <h4>Sorgu Sonuçları:</h4>
                     <p>Sorgu başarılı ancak sonuç bulunamadı.</p>
                 </div>
             `;
@@ -831,7 +1239,7 @@ class SQLAgentApp {
             // Error
             resultsHtml = `
                 <div class="saved-query-error">
-                    <h4>❌ Hata Mesajı:</h4>
+                    <h4>Hata Mesajı:</h4>
                     <p>${this.escapeHtml(query.error_message)}</p>
                 </div>
             `;
@@ -843,20 +1251,20 @@ class SQLAgentApp {
                     <div class="saved-query-info">
                         <div class="saved-query-id">Sorgu #${query.id}</div>
                         <div class="saved-query-question">
-                            <strong>💬 Soru:</strong> ${this.escapeHtml(query.question)}
+                            <strong>Soru:</strong> ${this.escapeHtml(query.question)}
                         </div>
                         <div class="saved-query-meta">
-                            <span>📅 ${createdDate}</span>
+                            <span>${createdDate}</span>
                             <span class="saved-query-status ${statusClass}">${statusText}</span>
                         </div>
                         <div class="saved-query-tables">
-                            <strong>📋 Kullanılan Tablolar:</strong> ${tablesHtml}
+                            <strong>Kullanılan Tablolar:</strong> ${tablesHtml}
                         </div>
                     </div>
                 </div>
                 
                 <div class="saved-query-sql-section">
-                    <h4>🔍 SQL Sorgusu:</h4>
+                    <h4>SQL Sorgusu:</h4>
                     <div class="sql-code-block">
                         <pre><code>${formattedSql}</code></pre>
                     </div>
@@ -866,13 +1274,13 @@ class SQLAgentApp {
                 
                 <div class="saved-query-actions">
                     <button class="btn btn-sm btn-secondary" onclick="app.copyQuery(${query.id})">
-                        📋 SQL'i Kopyala
+                        SQL'i Kopyala
                     </button>
                     <button class="btn btn-sm btn-primary" onclick="app.reRunQuery(${query.id})">
-                        🔄 Tekrar Çalıştır
+                        Tekrar Çalıştır
                     </button>
                     <button class="btn btn-sm btn-danger" onclick="app.deleteQuery(${query.id})">
-                        🗑️ Sil
+                        Sil
                     </button>
                 </div>
             </div>
@@ -1151,7 +1559,7 @@ class SQLAgentApp {
             if (recommended && type === recommended) {
                 btn.classList.add('recommended');
                 if (!btn.dataset.originalText) btn.dataset.originalText = btn.textContent;
-                btn.textContent = `🏅 ${btn.dataset.originalText} · Önerilen`;
+                btn.textContent = `${btn.dataset.originalText} · Önerilen`;
                 btn.style.backgroundColor = '#fde7c6'; // light orange background
                 btn.style.borderColor = '#f59e0b';
             } else {
@@ -1324,23 +1732,23 @@ class SQLAgentApp {
 
         this.elements.chartDetails.innerHTML = `
             <div class="chart-stat">
-                <div class="chart-stat-label">📊 Veri Sayısı</div>
+                <div class="chart-stat-label">Veri Sayısı</div>
                 <div class="chart-stat-value">${totalDataPoints}</div>
             </div>
             <div class="chart-stat">
-                <div class="chart-stat-label">📈 Toplam</div>
+                <div class="chart-stat-label">Toplam</div>
                 <div class="chart-stat-value">${total.toFixed(2)}</div>
             </div>
             <div class="chart-stat">
-                <div class="chart-stat-label">📊 Ortalama</div>
+                <div class="chart-stat-label">Ortalama</div>
                 <div class="chart-stat-value">${average}</div>
             </div>
             <div class="chart-stat">
-                <div class="chart-stat-label">⬆️ Maksimum</div>
+                <div class="chart-stat-label">Maksimum</div>
                 <div class="chart-stat-value">${max}</div>
             </div>
             <div class="chart-stat">
-                <div class="chart-stat-label">⬇️ Minimum</div>
+                <div class="chart-stat-label">Minimum</div>
                 <div class="chart-stat-value">${min}</div>
             </div>
         `;
@@ -1353,6 +1761,6 @@ class SQLAgentApp {
 document.addEventListener('DOMContentLoaded', () => {
     // DOM tamamen yüklendikten sonra uygulamayı başlat
     setTimeout(() => {
-        window.app = new SQLAgentApp();
+        window.app = new NIQApp();
     }, 100); // 100ms gecikme ile DOM elementlerinin hazır olduğundan emin ol
 });

@@ -1,11 +1,11 @@
-# SQL Agent Desktop — Enterprise-Grade Natural Language to SQL Platform
+# NIQ — Natural Intelligence Query (Desktop)
 
 A sophisticated, enterprise-ready desktop application that transforms natural language questions into optimized SQL queries for Microsoft SQL Server. Built with modern software engineering principles, featuring modular architecture, professional installer, and military-grade security through OS-integrated credential management.
 
 ## 📦 Installation Options
 
 ### For End Users (Recommended)
-Download and run the Windows installer: **SQLAgent_Setup.exe**
+Download and run the Windows installer: **NIQ_Setup.exe**
 - ✅ One-click installation
 - ✅ Desktop shortcuts
 - ✅ Start menu integration  
@@ -17,7 +17,7 @@ Clone the repository and run from source code (see Development Setup below)
 
 ## 🚀 Overview
 
-SQL Agent represents the next generation of database interaction tools, combining the power of artificial intelligence with enterprise-grade security and performance. The platform enables users to:
+NIQ (Natural Intelligence Query) represents the next generation of database interaction tools, combining the power of artificial intelligence with enterprise-grade security and performance. The platform enables users to:
 
 - **Natural Language Processing**: Convert complex business questions into precise SQL queries using OpenAI's advanced language models
 - **Intelligent Schema Discovery**: Automatically discover and map database structures, tables, and relationships

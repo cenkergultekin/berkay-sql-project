@@ -3,144 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Agent - Clean Architecture</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <title>NIQ</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=4.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1>🤖 SQL Agent</h1>
-            <p class="subtitle">Doğal dil ile SQL sorguları oluşturun</p>
-        </header>
+<body class="sidebar-collapsed">
+    <div class="app-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar collapsed" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">NIQ</div>
+                <div class="sidebar-subtitle">Natural Intelligence Query</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="sidebar-nav-item active" data-page="dashboard-page">
+                    <span class="sidebar-nav-icon"></span>
+                    <span>Ana Sayfa</span>
+                </button>
+                <button class="sidebar-nav-item" data-page="query-page">
+                    <span class="sidebar-nav-icon"></span>
+                    <span>Sorgu Çalıştır</span>
+                </button>
+                <button class="sidebar-nav-item" data-page="history-page">
+                    <span class="sidebar-nav-icon"></span>
+                    <span>Sorgularım</span>
+                </button>
+                <button class="sidebar-nav-item" data-page="charts-page">
+                    <span class="sidebar-nav-icon"></span>
+                    <span>Grafikler</span>
+                </button>
+            </nav>
+        </aside>
 
-        <main class="main-content">
-            <!-- Navigation Menu -->
-            <div class="navigation-container">
-                <nav class="main-navigation">
-                    <button class="nav-btn active" data-page="query-page">🚀 Sorgu Çalıştır</button>
-                    <button class="nav-btn" data-page="history-page">📚 Sorgularım</button>
-                    <button class="nav-btn" data-page="dashboard-page">📊 Dashboard</button>
-                </nav>
+        <!-- Sidebar Toggle Button -->
+        <button class="sidebar-toggle" id="sidebar-toggle">
+            <span class="sidebar-toggle-icon"></span>
+        </button>
+
+        <div class="container">
+            <!-- Modern Header -->
+            <header class="modern-header">
+                <div class="header-left">
+                    <div class="app-brand">
+                        <h1 class="brand-title">NIQ</h1>
+                        <span class="brand-subtitle">Natural Intelligence Query</span>
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <div class="connection-badge" id="connection-badge">
+                        <div class="badge-dot"></div>
+                        <span class="badge-text">Bağlantı Yok</span>
+                    </div>
+                </div>
+            </header>
+
+            <main class="main-content">
+
+            <!-- Dashboard Page Content (New Default) -->
+            <div id="dashboard-page" class="page-content active">
+                <!-- Welcome Section -->
+                <section class="welcome-section">
+                    <div class="welcome-content">
+                        <h2>Hoş Geldiniz</h2>
+                        <p>Doğal dille SQL sorguları oluşturun ve verilerinizi analiz edin</p>
+                    </div>
+                </section>
+
+                <!-- Quick Actions - Primary Focus -->
+                <section class="quick-actions-section primary-section">
+                    <div class="section-header">
+                        <h2>Hızlı İşlemler</h2>
+                        <p class="section-subtitle">En sık kullanılan işlemler</p>
+                    </div>
+                    <div class="actions-grid" id="dynamic-actions-grid">
+                        <!-- Actions will be dynamically populated based on connection status -->
+                    </div>
+                </section>
+
+                <!-- Stats Overview - Secondary -->
+                <section class="stats-overview secondary-section">
+                    <div class="section-header">
+                        <h2>Özet Bilgiler</h2>
+                        <p class="section-subtitle">Genel istatistikler</p>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <div class="icon-chart"></div>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Toplam Sorgu</h3>
+                                <span class="stat-number" id="total-queries">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <div class="icon-database"></div>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Bağlı Veritabanı</h3>
+                                <span class="stat-text" id="connected-db">-</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <div class="icon-lightning"></div>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Son Sorgu</h3>
+                                <span class="stat-text" id="last-query">-</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <div class="icon-trend"></div>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Başarı Oranı</h3>
+                                <span class="stat-text" id="success-rate">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recent Activity -->
+                <section class="recent-activity-section">
+                    <div class="section-header">
+                        <h2>Son Aktiviteler</h2>
+                        <button class="view-all-btn">Tümünü Gör</button>
+                    </div>
+                    <div class="activity-container" id="recent-activities">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <div class="icon-activity"></div>
+                            </div>
+                            <h3>Henüz aktivite yok</h3>
+                            <p>İlk sorgunuzu oluşturun ve aktivitelerinizi burada görün</p>
+                        </div>
+                    </div>
+                </section>
             </div>
 
-            <!-- Query Page Content -->
-            <div id="query-page" class="page-content active">
+            <!-- Query Page Content (Updated) -->
+            <div id="query-page" class="page-content">
                 <!-- Database Connection Section -->
                 <section class="section" id="db-section">
-                    <h2>📊 Veritabanı Bağlantısı</h2>
-                <div class="input-group">
-                    <label for="db_driver">Driver:</label>
-                    <input 
-                        type="text" 
-                        id="db_driver" 
-                        placeholder="ODBC Driver 17 for SQL Server"
-                        class="input-field"
-                        value="ODBC Driver 17 for SQL Server"
-                    >
-                </div>
-                <div class="input-group">
-                    <label for="db_server">Server:</label>
-                    <input 
-                        type="text" 
-                        id="db_server" 
-                        placeholder="192.168.56.1 veya sunucu adı"
-                        class="input-field"
-                        autocomplete="off"
-                    >
-                </div>
-                <div class="input-group">
-                    <label for="db_database">Database:</label>
-                    <input 
-                        type="text" 
-                        id="db_database" 
-                        placeholder="sinav"
-                        class="input-field"
-                        autocomplete="off"
-                    >
-                </div>
-                <div class="input-group">
-                    <label for="db_username">Username:</label>
-                    <input 
-                        type="text" 
-                        id="db_username" 
-                        placeholder="berkyyd"
-                        class="input-field"
-                        autocomplete="username"
-                    >
-                </div>
-                <div class="input-group">
-                    <label for="db_password">Password:</label>
-                    <input 
-                        type="password" 
-                        id="db_password" 
-                        placeholder="Parola"
-                        class="input-field"
-                        autocomplete="current-password"
-                    >
-                </div>
-                <div class="input-group">
-                    <label for="db_conn">Veya Connection String (opsiyonel):</label>
-                    <input 
-                        type="text" 
-                        id="db_conn" 
-                        placeholder="DRIVER={...};SERVER=...;DATABASE=...;UID=...;PWD=..."
-                        class="input-field"
-                    >
-                </div>
-                <div class="input-group">
-                    <button id="set-db-btn" class="btn btn-primary">Bağlantıyı Kaydet</button>
-                    <button id="clear-db-btn" class="btn btn-danger" style="margin-left:8px;">Bağlantı bilgilerini kaldır</button>
-                </div>
-                <div id="db-status" class="status-message"></div>
-            </section>
-
-            <!-- Table Selection Section -->
-            <section class="section" id="tables-section">
-                <h2>📋 Tablo Seçimi</h2>
-                <div class="input-group">
-                    <label for="table_name">Tablolar (Ctrl/Command ile çoklu seçim):</label>
-                    <select id="table_name" multiple class="select-field" disabled>
-                        <option value="">Önce veritabanı bağlantısını kurun</option>
-                    </select>
-                </div>
-            </section>
-
-            <!-- Schema Information Section -->
-            <section class="section" id="schema-section">
-                <h2>🏗️ Seçilen Tablo/Kolonlar</h2>
-                <div id="columns" class="schema-info">
-                    <p class="placeholder">Tablolar seçildiğinde kolonlar burada görünecek</p>
-                </div>
-            </section>
-
-            <!-- Query Section -->
-            <section class="section" id="query-section">
-                <h2>💬 Soru / SQL Sorgusu</h2>
-                <div class="input-group">
-                    <label for="question">Doğal dilde sorunuzu yazın:</label>
-                    <textarea 
-                        id="question" 
-                        rows="4" 
-                        class="textarea-field"
-                        placeholder="Örnek: En yüksek maaşlı çalışanları getir"
-                    ></textarea>
+                    <h2>Veritabanı Bağlantısı</h2>
+                    
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="db_server">Server</label>
+                            <input 
+                                type="text" 
+                                id="db_server" 
+                                placeholder="192.168.56.1 veya sunucu adı"
+                                class="input-field"
+                                autocomplete="off"
+                            >
+                        </div>
+                        <div class="input-group">
+                            <label for="db_database">Database</label>
+                            <input 
+                                type="text" 
+                                id="db_database" 
+                                placeholder="Veritabanı adı"
+                                class="input-field"
+                                autocomplete="off"
+                            >
+                        </div>
+                        <div class="input-group">
+                            <label for="db_username">Username</label>
+                            <input 
+                                type="text" 
+                                id="db_username" 
+                                placeholder="Kullanıcı adı"
+                                class="input-field"
+                                autocomplete="username"
+                            >
+                        </div>
+                        <div class="input-group">
+                            <label for="db_password">Password</label>
+                            <input 
+                                type="password" 
+                                id="db_password" 
+                                placeholder="Parola"
+                                class="input-field"
+                                autocomplete="current-password"
+                            >
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-options">
+                        <details>
+                            <summary>Gelişmiş Ayarlar</summary>
+                            <div class="input-group">
+                                <label for="db_driver">Driver</label>
+                                <input 
+                                    type="text" 
+                                    id="db_driver" 
+                                    placeholder="ODBC Driver 17 for SQL Server"
+                                    class="input-field"
+                                    value="ODBC Driver 17 for SQL Server"
+                                >
+                            </div>
+                            <div class="input-group">
+                                <label for="db_conn">Connection String (opsiyonel)</label>
+                                <input 
+                                    type="text" 
+                                    id="db_conn" 
+                                    placeholder="DRIVER={...};SERVER=...;DATABASE=...;UID=...;PWD=..."
+                                    class="input-field"
+                                >
+                            </div>
+                        </details>
+                    </div>
+                    
                     <div class="button-group">
-                        <button id="send-query-btn" class="btn btn-success" disabled>
-                            🚀 Sorguyu Gönder
+                        <button id="set-db-btn" class="btn btn-primary">
+                            Bağlan
+                        </button>
+                        <button id="clear-db-btn" class="btn btn-secondary">
+                            <span></span> Temizle
+                        </button>
+                    </div>
+                    
+                    <div id="db-status" class="status-message"></div>
+                </section>
+
+            <!-- Table Selection & Query Section -->
+            <section class="section" id="query-section">
+                <h2>SQL Sorgu Oluşturucu</h2>
+                
+                <div class="query-form">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="table_name">Tablolar</label>
+                            <select id="table_name" multiple class="select-field" disabled>
+                                <option value="">Önce veritabanı bağlantısını kurun</option>
+                            </select>
+                            <small class="help-text">Ctrl/Cmd ile çoklu seçim yapabilirsiniz</small>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="question">Doğal Dil Sorgusu</label>
+                            <textarea 
+                                id="question" 
+                                rows="4" 
+                                class="textarea-field"
+                                placeholder="Örnek: En yüksek maaşlı çalışanları getir veya Son 30 günde yapılan satışları listele"
+                            ></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="send-query-btn" class="btn btn-primary" disabled>
+                            Sorguyu Çalıştır
                         </button>
                         <button id="clear-btn" class="btn btn-secondary">
-                            🧹 Temizle
+                            <span></span> Temizle
                         </button>
                     </div>
                 </div>
             </section>
 
+            <!-- Schema Information Section -->
+            <section class="section" id="schema-section" style="display: none;">
+                <h2>📋 Seçilen Tablolar</h2>
+                <div id="columns" class="schema-info">
+                    <p class="placeholder">Tablolar seçildiğinde kolonlar burada görünecek</p>
+                </div>
+            </section>
+
                 <!-- Results Section -->
                 <section class="section" id="results-section">
-                    <h2>📊 Sonuçlar</h2>
+                    <h2>Sorgu Sonuçları</h2>
                     <div id="results" class="results-container">
-                        <p class="placeholder">Sorgu sonuçları burada görünecek</p>
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <div class="icon-chart"></div>
+                            </div>
+                            <h3>Sorgu sonuçlarınız burada görünecek</h3>
+                            <p>Yukarıdan bir sorgu çalıştırın ve sonuçları görün</p>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -149,11 +295,11 @@
             <!-- Query History Page Content -->
             <div id="history-page" class="page-content">
                 <section class="section" id="query-history-section">
-                    <h2>📚 Sorgu Geçmişim</h2>
+                    <h2>Sorgu Geçmişim</h2>
                     <div class="query-history-controls">
-                        <button id="refresh-queries-btn" class="btn btn-primary">🔄 Yenile</button>
-                        <button id="export-queries-btn" class="btn btn-success">💾 Dosyaya Kaydet</button>
-                        <button id="clear-all-queries-btn" class="btn btn-danger">🗑️ Tümünü Sil</button>
+                        <button id="refresh-queries-btn" class="btn btn-primary">Yenile</button>
+                        <button id="export-queries-btn" class="btn btn-success">Dosyaya Kaydet</button>
+                        <button id="clear-all-queries-btn" class="btn btn-danger">Tümünü Sil</button>
                     </div>
                     <div id="saved-queries-list" class="query-history-container">
                         <p class="placeholder">Sorgu geçmişi yükleniyor...</p>
@@ -161,10 +307,10 @@
                 </section>
             </div>
 
-            <!-- Dashboard Page Content -->
-            <div id="dashboard-page" class="page-content">
-                <section class="section" id="dashboard-section">
-                    <h2>📊 Dashboard & Grafikler</h2>
+            <!-- Charts Page Content -->
+            <div id="charts-page" class="page-content">
+                <section class="section" id="charts-section">
+                    <h2>Veri Görselleştirme</h2>
                     
                     <!-- Dashboard Controls -->
                     <div class="dashboard-controls">
@@ -178,23 +324,23 @@
                         <div class="chart-type-selector">
                             <label>Grafik Tipi:</label>
                             <div class="chart-type-buttons">
-                                <button class="chart-type-btn active" data-chart-type="bar">📊 Bar</button>
-                                <button class="chart-type-btn" data-chart-type="line">📈 Çizgi</button>
-                                <button class="chart-type-btn" data-chart-type="pie">🥧 Pasta</button>
-                                <button class="chart-type-btn" data-chart-type="doughnut">🍩 Halka</button>
-                                <button class="chart-type-btn" data-chart-type="area">📉 Alan</button>
+                                <button class="chart-type-btn active" data-chart-type="bar">Bar</button>
+                                <button class="chart-type-btn" data-chart-type="line">Çizgi</button>
+                                <button class="chart-type-btn" data-chart-type="pie">Pasta</button>
+                                <button class="chart-type-btn" data-chart-type="doughnut">Halka</button>
+                                <button class="chart-type-btn" data-chart-type="area">Alan</button>
                             </div>
                         </div>
                         
                         <button id="create-chart-btn" class="btn btn-success btn-large" disabled>
-                            ✨ Grafik Oluştur
+                            Grafik Oluştur
                         </button>
                     </div>
                     
                     <!-- Chart Display Area -->
                     <div id="chart-container" class="chart-display-area">
                         <div class="no-chart-placeholder">
-                            <div class="no-chart-icon">📊</div>
+                            <div class="no-chart-icon">Grafik</div>
                             <h3>Grafik Oluşturmaya Hazır!</h3>
                             <p>Yukarıdan bir sorgu seçin ve grafik tipini belirleyin</p>
                             <p class="help-text">💡 İpucu: Sayısal değerler içeren sorgular en iyi grafikleri oluşturur</p>
@@ -204,17 +350,18 @@
                     
                     <!-- Chart Info -->
                     <div id="chart-info" class="chart-info" style="display: none;">
-                        <h4>📋 Grafik Bilgileri</h4>
+                        <h4>Grafik Bilgileri</h4>
                         <div id="chart-details"></div>
                     </div>
                 </section>
             </div>
 
-        </main>
+            </main>
 
-        <footer class="footer">
-            <p>SQL Agent v2.0 - Clean Code Architecture</p>
-        </footer>
+            <footer class="footer">
+                <p>NIQ v2.0 - Natural Intelligence Query</p>
+            </footer>
+        </div>
     </div>
 
     <script src="/static/js/app.js"></script>

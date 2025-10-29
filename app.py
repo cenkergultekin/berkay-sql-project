@@ -23,7 +23,7 @@ if getattr(sys, 'frozen', False):
     
     # Debug için path'leri yazdır ve dosyaya kaydet
     debug_info = f"""
-=== SQL Agent Debug Info ===
+=== NIQ Debug Info (Natural Intelligence Query) ===
 Bundle dir: {bundle_dir}
 Template folder: {template_folder}
 Static folder: {static_folder}
