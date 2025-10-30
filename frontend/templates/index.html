@@ -162,6 +162,18 @@
                                 class="input-field"
                                 autocomplete="off"
                             >
+                            <button type="button" id="ip-help-toggle" class="ip-help-btn pulse">IP öğren</button>
+                            <div class="server-hint-box" style="display:none">
+                                <span class="server-hint-message">
+                                    <b>Sunucu adresinizi bilmiyor musunuz?</b><br>
+                                    IP'nizi öğrenmek için Komut İstemi (cmd) tarafına şu kodu gönderin.<br>
+                                    Server tarafına <b>CTRL+V</b> yaparak server bilginizi girebilirsiniz.
+                                    <div class="server-cmd-row">
+                                        <code id="server-ip-cmd">for /f "tokens=14" %a in ('ipconfig ^| findstr "IPv4"') do @echo %a | clip</code>
+                                        <button type="button" class="copy-server-ip-btn" id="copy-server-ip-btn" title="Kodu kopyala">Kopyala</button>
+                                    </div>
+                                </span>
+                            </div>
                         </div>
                         <div class="input-group">
                             <label for="db_database">Database</label>
@@ -346,6 +358,7 @@
                             <p class="help-text">💡 İpucu: Sayısal değerler içeren sorgular en iyi grafikleri oluşturur</p>
                         </div>
                         <canvas id="dashboard-chart" style="display: none;"></canvas>
+                        <div id="chart-error-message" class="chart-error-message" style="display:none"></div>
                     </div>
                     
                     <!-- Chart Info -->

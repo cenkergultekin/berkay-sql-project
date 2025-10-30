@@ -750,7 +750,7 @@ class NIQApp {
         for (const [tableName, columns] of Object.entries(columnsData)) {
             html += `
                 <div class="table-schema">
-                    <h4>📋 ${tableName}</h4>
+                    <h4>${tableName}</h4>
                     <div class="columns-list">
                         ${columns.map(col => `<span class="column-tag">${col}</span>`).join('')}
                     </div>
@@ -1195,7 +1195,7 @@ class NIQApp {
         if (query.is_successful && query.query_results && query.query_results.length > 0) {
             // SELECT query with results
             const headers = Object.keys(query.query_results[0]);
-            const tableRows = query.query_results.slice(0, 10).map(row => 
+            const tableRows = query.query_results.slice.map(row => 
                 `<tr>${headers.map(header => `<td>${this.escapeHtml(String(row[header] || ''))}</td>`).join('')}</tr>`
             ).join('');
             
@@ -1341,7 +1341,7 @@ class NIQApp {
             
             if (response.success && response.data.length > 0) {
                 // Create file content
-                let fileContent = `# SQL Agent - Kayıtlı Sorgular\n`;
+                let fileContent = `# NIQ - Kayıtlı Sorgular\n`;
                 fileContent += `# Oluşturulma Tarihi: ${new Date().toLocaleString('tr-TR')}\n`;
                 fileContent += `# Toplam Sorgu Sayısı: ${response.data.length}\n\n`;
                 
@@ -1511,7 +1511,7 @@ class NIQApp {
         const results = query.query_results;
         
         if (!results || results.length === 0) {
-            this.showStatus('Sorgu sonucu boş', 'error');
+            this.displayChartError('Sorgu sonucu boş');
             return;
         }
 
@@ -1519,10 +1519,11 @@ class NIQApp {
         const chartData = this.analyzeDataForChart(results);
         
         if (!chartData) {
-            this.showStatus('Bu sorgu verisi grafik oluşturmak için uygun değil', 'error');
+            this.displayChartError('Bu sorgu verisi grafik oluşturmak için uygun değil');
             return;
         }
 
+        this.displayChartError(''); // Başarılıysa hata mesajını temizle
         // Hide placeholder, show canvas
         const placeholder = this.elements.chartContainer.querySelector('.no-chart-placeholder');
         if (placeholder) placeholder.style.display = 'none';
@@ -1755,6 +1756,19 @@ class NIQApp {
 
         this.elements.chartInfo.style.display = 'block';
     }
+
+    displayChartError(message) {
+        const el = this.elements.chartContainer.querySelector('#chart-error-message');
+        if (el) {
+            if (message) {
+                el.textContent = message;
+                el.style.display = 'block';
+            } else {
+                el.textContent = '';
+                el.style.display = 'none';
+            }
+        }
+    }
 }
 
 // Initialize application when DOM is loaded
@@ -1763,4 +1777,35 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         window.app = new NIQApp();
     }, 100); // 100ms gecikme ile DOM elementlerinin hazır olduğundan emin ol
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    var copyBtn = document.getElementById('copy-server-ip-btn');
+    var ipCmd = document.getElementById('server-ip-cmd');
+    if(copyBtn && ipCmd) {
+        copyBtn.addEventListener('click', function () {
+            navigator.clipboard.writeText(ipCmd.textContent.trim());
+            copyBtn.classList.add('copied');
+            copyBtn.textContent = 'Kopyalandı!';
+            setTimeout(function () {
+                copyBtn.textContent = 'Kopyala';
+                copyBtn.classList.remove('copied');
+            }, 1000);
+        });
+    }
+
+    var ipHelpBtn = document.getElementById('ip-help-toggle');
+    var hintBox = document.querySelector('.server-hint-box');
+    if (ipHelpBtn && hintBox) {
+        ipHelpBtn.addEventListener('click', function () {
+            var willShow = hintBox.style.display === 'none' || hintBox.style.display === '';
+            hintBox.style.display = willShow ? 'block' : 'none';
+            ipHelpBtn.textContent = willShow ? 'Kapat' : 'IP öğren';
+            if (willShow) {
+                ipHelpBtn.classList.remove('pulse');
+            } else {
+                ipHelpBtn.classList.add('pulse');
+            }
+        });
+    }
 });
